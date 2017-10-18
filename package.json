@@ -1,7 +1,7 @@
 {
   "name": "slotsgamealgo_fwbro",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "slots game algo - fwbro",
   "main": "index.js",
   "scripts": {
     "configure": "node-gyp configure",
