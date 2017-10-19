@@ -269,7 +269,7 @@ int countResultWithYX(GameSceneEx& gse, int x, int y, TotalResult& tr, PayTables
         return totalwin;
     }
 
-    if (y >= 3) {
+    if (y < 2) {
         return totalwin;
     }
 
