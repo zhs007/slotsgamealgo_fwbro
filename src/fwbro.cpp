@@ -16,15 +16,15 @@ struct TotalResult{
 
 typedef std::vector<int> LineArray;
 
-int countLine(TotalResult& tr, LineArray& li, PayTables& pt, int bx, int lasts, int& symbolnums, int& win, bool& hasw) {
+int countLine(TotalResult& tr, LineArray& li, PayTables& pt, int bx, int lasts, int& symbolnums, int& win, bool& hasw, bool lastw) {
     symbolnums = 0;
     win = 0;
+    hasw = false;
 
     if (li.size() - bx < 3) {
         return -1;
     }
 
-    hasw = false;
     int s = li[bx];
     int nums = 1;
     if (s < 0) {
@@ -32,6 +32,10 @@ int countLine(TotalResult& tr, LineArray& li, PayTables& pt, int bx, int lasts, 
     }
 
     if (s == 0) {
+        if (lastw) {
+            return -1;
+        }
+
         hasw = true;
         int nnums = 0;
         int ns = -1;
@@ -105,12 +109,17 @@ int countResultWithX(GameSceneEx& gse, int y, TotalResult& tr, PayTables& pt, Ga
     }
 
     int lasts = -1;
+    bool lastw = false;
     for (int ii = 0; ii < 3; ++ii) {
         int symbolnums = 0;
         int win = 0;
         bool hasw = false;
-        int ret = countLine(tr, li, pt, ii, lasts, symbolnums, win, hasw);
+        int ret = countLine(tr, li, pt, ii, lasts, symbolnums, win, hasw, lastw);
         if (ret >= 0) {
+            if (ret == 0 || hasw) {
+                lastw = true;
+            }
+
             win *= mul;
 
             lasts = ret;
@@ -151,12 +160,17 @@ int countResultWithY(GameSceneEx& gse, int x, TotalResult& tr, PayTables& pt, Ga
     }
 
     int lasts = -1;
+    bool lastw = false;
     for (int ii = 0; ii < 3; ++ii) {
         int symbolnums = 0;
         int win = 0;
         bool hasw = false;
-        int ret = countLine(tr, li, pt, ii, lasts, symbolnums, win, hasw);
+        int ret = countLine(tr, li, pt, ii, lasts, symbolnums, win, hasw, lastw);
         if (ret >= 0) {
+            if (ret == 0 || hasw) {
+                lastw = true;
+            }
+
             win *= mul;
 
             lasts = ret;
@@ -205,12 +219,17 @@ int countResultWithXY(GameSceneEx& gse, int x, int y, TotalResult& tr, PayTables
     }
 
     int lasts = -1;
+    bool lastw = false;
     for (int ii = 0; ii < 3; ++ii) {
         int symbolnums = 0;
         int win = 0;
         bool hasw = false;
-        int ret = countLine(tr, li, pt, ii, lasts, symbolnums, win, hasw);
+        int ret = countLine(tr, li, pt, ii, lasts, symbolnums, win, hasw, lastw);
         if (ret >= 0) {
+            if (ret == 0 || hasw) {
+                lastw = true;
+            }
+
             win *= mul;
 
             lasts = ret;
@@ -258,13 +277,18 @@ int countResultWithYX(GameSceneEx& gse, int x, int y, TotalResult& tr, PayTables
         li.push_back(gse.getVal(x + ii, y - ii));
     }
 
+    bool lastw = false;
     int lasts = -1;
     for (int ii = 0; ii < 3; ++ii) {
         int symbolnums = 0;
         int win = 0;
         bool hasw = false;
-        int ret = countLine(tr, li, pt, ii, lasts, symbolnums, win, hasw);
+        int ret = countLine(tr, li, pt, ii, lasts, symbolnums, win, hasw, lastw);
         if (ret >= 0) {
+            if (ret == 0 || hasw) {
+                lastw = true;
+            }
+
             win *= mul;
 
             lasts = ret;
@@ -320,4 +344,45 @@ int countResult(GameSceneEx& gse, TotalResult& tr, PayTables& pt, GameSceneEx& g
     totalwin += countResultWithYX(gse, 2, 4, tr, pt, gse_remove, mul);
 
     return totalwin;
+}
+
+int procGameScene(int arr[5][5], std::vector<PaytablesNode>& lstpaytables, bool isfree) {
+    GameSceneEx gse;
+    PayTables pt;
+    TotalResult tr;
+    int totalpay = 0;
+    int downnums = 0;
+
+    gse.init(arr);
+    pt.init(lstpaytables);
+
+    while (true) {
+        GameSceneEx gse_remove;
+        gse_remove.clear();
+        int curmul = downnums + 1;
+        if (!isfree) {
+            curmul = 1;
+        }
+
+        int cw = countResult(gse, tr, pt, gse_remove, curmul);
+        
+        if (cw > 0) {
+            ++downnums;
+            totalpay += cw;
+            // gse.output("start");
+            gse_remove.setGameSceneWithVal(gse, -1, -1);
+            gse_remove.setGameSceneWithVal(gse, 1, 0);
+            // gse.output("proc");
+            gse.procDown();
+            // gse.output("procdown");
+        }
+        else {
+            tr.sr.addDown(downnums);
+            tr.pi.add(totalpay);
+
+            break;
+        }
+    }
+
+    return totalpay;
 }

@@ -4,6 +4,18 @@
 
 #include "slotslogic.h"
 
+void PayTables::init(std::vector<PaytablesNode>& lstpaytables) {
+    int w = 5;
+    int h = (int)lstpaytables.size();
+    init(w, h);
+
+    for (int y = 0; y < h; ++y) {
+        for (int x = 0; x < w; ++x) {
+            lst[y][x] = lstpaytables[y].payout[x];
+        }
+    }
+}
+
 void PayTables::init(int w, int h) {
     lst = (int**)malloc(w * h * sizeof(int) + h * sizeof(int*));
     char* bp = (char*)lst + h * sizeof(int*);

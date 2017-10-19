@@ -15,6 +15,11 @@
 #include <string>
 // #include "csv.h"
 
+struct PaytablesNode{
+    int symbol;
+    int payout[5];
+};
+
 struct PayTables {
     int** lst;
     int width, height;
@@ -23,6 +28,8 @@ struct PayTables {
     PayTables() : lst(NULL), width(0), height(0) {}
 
     void init(int w, int h);
+
+    void init(std::vector<PaytablesNode>& lstpaytables);
 
     void output() {
         printf("paytables\n");
@@ -559,7 +566,7 @@ struct SlotsResult {
 //            return ;
 //        }
 
-        if (downnums >= lstdown.size()) {
+        if (downnums >= (int)lstdown.size()) {
             for (int i = lstdown.size(); i <= downnums; ++i) {
                 lstdown.push_back(0);
             }
@@ -677,6 +684,14 @@ struct SymbolList{
 template <int WIDTH, int HEIGHT>
 struct GameScene{
     int arr[HEIGHT][WIDTH];
+
+    void init(int src[HEIGHT][WIDTH]) {
+        memcpy(&(arr[0][0]), &(src[0][0]), sizeof(int) * WIDTH * HEIGHT);
+    }
+
+    void init(int** src) {
+        memcpy(&(arr[0][0]), &(src[0][0]), sizeof(int) * WIDTH * HEIGHT);
+    }
 
     void init(GameScene<WIDTH, HEIGHT>& gs) {
         memcpy(&(arr[0][0]), &(gs.arr[0][0]), sizeof(int) * WIDTH * HEIGHT);

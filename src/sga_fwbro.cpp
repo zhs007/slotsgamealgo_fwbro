@@ -1,20 +1,16 @@
 #include "sga_fwbro.h"
 #include <vector>
-
-struct PaytablesNode{
-    int symbol;
-    int payout[5];
-};
+#include "fwbro.h"
 
 // countResult(arr, paytables)
 void countResult(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-    if (info.Length() != 2) {
+    if (info.Length() != 3) {
         Nan::ThrowTypeError("Wrong number of arguments");
 
         return;
     }
 
-    if (!info[0]->IsArray() || !info[1]->IsArray()) {
+    if (!info[0]->IsArray() || !info[1]->IsArray() || !info[2]->IsBoolean()) {
         Nan::ThrowTypeError("Wrong arguments");
 
         return;
@@ -88,4 +84,6 @@ void countResult(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
         lstPaytables.push_back(cn);
     }
+
+    procGameScene(symbolarr, lstPaytables, info[2]->BooleanValue());
 }
