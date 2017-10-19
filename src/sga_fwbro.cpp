@@ -85,5 +85,8 @@ void countResult(const Nan::FunctionCallbackInfo<v8::Value>& info) {
         lstPaytables.push_back(cn);
     }
 
-    procGameScene(symbolarr, lstPaytables, info[2]->BooleanValue());
+    int payout = procGameScene(symbolarr, lstPaytables, info[2]->BooleanValue());
+
+    v8::Local<v8::Number> num = Nan::New<v8::Number>(payout);
+    info.GetReturnValue().Set(num);
 }
